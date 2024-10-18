@@ -1,0 +1,28 @@
+resolver: lts-20.25
+allow-newer: true
+
+packages:
+- .
+
+extra-deps:
+- language-ecmascript-0.19.1.0@sha256:2cf08e581980e69fbac5f941c9f6493dc4c3527817c3d395f33f3ffb8ef98253,3833
+- hspec-2.10.6@sha256:c90dbcc629e88e5f56021c7dba26a97109a0c441aeece6ead217ee3fc83dcb68,1712
+- hspec-core-2.10.6@sha256:68a74267974fee22f4bc57b5d353391e8dc943b0d7ffaf5d47dab691765ee772,6659
+- hspec-discover-2.10.6@sha256:df63254c5aa8c5c2b9233b0067728394936b6c9af7e3a5d3d44df78d888dcefd,2167
+- git: https://github.com/Verification-for-Security/hrubric.git
+  commit: aa491476e220e5372f06133516d2626b39ad9a79
+- git: https://github.com/Verification-for-Security/emit-grade.git
+  commit: 0b8fb106b0f6328e44efd6c6ad212d9b73bb65a4
+
+extra-include-dirs:
+- z3/include
+- /usr/local/include
+
+extra-lib-dirs:
+- z3/bin
+- /usr/local/lib
+
+ghc-options:
+  # Make sure that the executables can actually find the z3 binary for dirs that
+  # are not in PATH.
+  vc-gen: -optl-Wl,-rpath,z3/bin

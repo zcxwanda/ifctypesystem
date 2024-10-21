@@ -6,7 +6,7 @@ In this assignment, you will implement a type checker for IFC (Information Flow 
 ## Running and testing
 
 This code again features a test bench, which you may run in the same fashion
-with `stack`. The tests again aim to direct you through to code base of this
+with `stack`. The tests aim to direct you through to code base of this
 assignment and we strongly suggest you follow this!
 
 ```
@@ -20,8 +20,7 @@ command.
 $ stack run -- -f <path-to-file>
 ```
 
-This will run the type checker on a single file. Again, you are allowed to make
-modification to `Main` if you wish to get more debug information.
+This will run the type checker on a single file. Again, you are allowed to modify `Main` if you wish to get more debug information.
 
 ## Assignment
 

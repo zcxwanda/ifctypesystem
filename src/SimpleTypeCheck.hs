@@ -10,9 +10,23 @@ import Expr
 import Logic
 import Lattice
 
--- `typeExp` takes a lattice structure, an environment, and an expression as inputs.
--- Returns the security level of the overall expression
--- For example: `sec + obs` would return sec
+-- The 'typeExp' function determines the security level of a given expression.
+-- It takes three inputs: a lattice structure, an environment, and an expression.
+-- The function returns the security level of the entire expression.
+-- 
+-- For example, 'typeExp' applied to `sec + obs` returns `sec`.
+-- To find the security level of a variable, use the 'get' function.
+
+-- Security levels, represented as strings, can be manipulated using lattice functions.
+
+-- You can compare two security levels using the 'lte' (less than or equal) function of a lattice.
+-- If 'lat' is a lattice, '(lte lat)' provides the less than or equal function.
+-- For instance, `(lte lat) "sec" "obs"` would evaluate to `False`.
+-- 
+-- Likewise, you can use the 'join' function to determine the join
+-- of two security levels. You can access the join function with '(lat join)'.
+
+-- For instance, `(join lat) "sec" "obs"` would evaluate to "sec"
 typeExp :: Lattice String -> Env String -> Expr String -> String
 typeExp lat env e = case e of 
          Const _ -> smallest lat

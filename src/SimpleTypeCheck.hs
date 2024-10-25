@@ -29,26 +29,37 @@ import Lattice
 -- For instance, `(join lat) "sec" "obs"` would evaluate to "sec"
 typeExp :: Lattice String -> Env String -> Expr String -> String
 typeExp lat env e = case e of 
-         Const _ -> smallest lat
-         _ -> undefined
-
+        Const _          -> smallest lat
+        Var (v :@ _)     -> undefined
+        BinOp op a b     -> undefined
+        Select {}        -> error "No arrays in SimpleTypeCheck"
+        Store  {}        -> error "No Store expressions in this assignment"
 
 -- typeLogic is analogous to typeExpr
 typeLogic :: Lattice String -> Env String -> Logic String -> String
 typeLogic lat env e = case e of
-        Neg l -> typeLogic lat env l
-        _ -> undefined
-
+        Neg l           -> typeLogic lat env l
+        And ls          -> undefined
+        Pred (a :==: b) -> undefined
+        Pred (a :>=: b) -> undefined
+        Forall _ _      -> error "We won't deal with Forall"
 
 -- typeStmt takes a lattice structure, a program counter, an environment, the whole Nano program, and a statement
 -- Returns whether the statement typechecks
 type Pc = String
 typeStmt :: Lattice String -> Pc -> Env String -> Statement String -> Bool
 typeStmt lat pc env s = case s of
-        Return _ -> True
-        _ -> undefined
+        Return _     -> True
+        Assign v e   -> undefined
+        If l st sf   -> undefined
+        While l st   -> undefined
+        Seq ss       -> undefined
+        ArrAsn {}    -> error "No arrays in SimpleTypeCheck" 
+        AppAsn {}    -> error "No function applications in SimpleTypeCheck"
+        Assert _     -> error "No assertions in this assignment"
+        Assume _     -> error "No assumptions in this assignment"
 
-    
+
 typeProg :: Nano String -> Bool
 typeProg prog = 
     let lattice = getLattice (getHasse prog)

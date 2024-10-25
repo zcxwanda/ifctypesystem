@@ -15,19 +15,37 @@ import Lattice
 -- The boolean indicates whether the expression passes type checking.
 -- As you know, when caches are involved, some expressions might fail to type check
 typeExp :: Lattice String -> Env String -> Expr String -> (Bool,String)
-typeExp lat env e = undefined
+typeExp lat env e = case e of
+    Const _          -> (True,smallest lat)    
+    Var (v :@ _)     -> undefined
+    BinOp op a b     -> undefined
+    Select {}        -> undefined
+    Store  {}        -> error "No Store expressions in this assignment"
+
 
 -- typeLogic is analogous to typeExpr
 typeLogic :: Lattice String -> Env String -> Logic String -> (Bool, String)
-typeLogic lat env l = undefined
-
+typeLogic lat env e = case e of
+    Pred (a :==: b) -> undefined
+    Pred (a :>=: b) -> undefined
+    And ls          -> undefined
+    Neg l           -> undefined
+    Forall {}       -> error "We won't deal with Forall"
+    
 -- `typeStmt` takes a lattice structure, an environment, and a statement, 
 -- and returns a boolean indicating whether the statement passes type checking.
 typeStmt :: Lattice String -> Env String -> Statement String -> Bool
-typeStmt lat env s = undefined
+typeStmt lat env s = case s of
+    Return _             -> True
+    Seq ss               -> undefined
+    If l st sf           -> undefined
+    While l st           -> undefined
+    Assign v e           -> undefined
+    ArrAsn arr index e   -> undefined 
+    AppAsn {}            -> error "No function applications in CacheTypeCheck"
+    Assert _             -> error "No assertions in this assignment"
+    Assume _             -> error "No assumptions in this assignment"
 
-
--- The typeProg function, updated for clarity
 typeProg :: Nano String -> Bool
 typeProg prog = 
     let lattice = getLattice (getHasse prog)

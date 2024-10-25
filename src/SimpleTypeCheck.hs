@@ -11,6 +11,8 @@ import Logic
 import Lattice
 
 -- `typeExp` takes a lattice structure, an environment, and an expression as inputs.
+-- Returns the security level of the overall expression
+-- For example: `sec + obs` would return sec
 typeExp :: Lattice String -> Env String -> Expr String -> String
 typeExp lat env e = case e of 
          Const _ -> smallest lat

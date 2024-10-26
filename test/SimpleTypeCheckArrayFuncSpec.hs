@@ -30,32 +30,30 @@ rubric = do
 
   correctVerifier <- lift . runIO . newIORef $ True
 
-  criterion "Simple type check with arrays and functions" 1 $ do
-    bcriterion "simple with functions and arrays" 1.0 0.5 $ do
-      let getPrograms' dir = fmap (dir <>) <$> getPrograms dir
-      let check b f = dpasses f $ do
-            valid <- verify f `catch` \(_ :: SomeException) -> do
-              return $ not b
-            when (valid /= b) $ do
-              writeIORef correctVerifier False
-            valid @?= b
+  let getPrograms' dir = fmap (dir <>) <$> getPrograms dir
+  let check b f = dpasses f $ do
+        valid <- verify f `catch` \(_ :: SomeException) -> do
+          return $ not b
+        when (valid /= b) $ do
+          writeIORef correctVerifier False
+        valid @?= b
 
-      criterion "rejects negative files" 0.2 . distribute $ do
-        let dir = "programs/simplearrfunc/neg/"
-        neg <- getPrograms' dir
+  criterion "rejects negative files" 0.2 . distribute $ do
+    let dir = "programs/simplearrfunc/neg/"
+    neg <- getPrograms' dir
 
-        mapM_ (check False) neg
+    mapM_ (check False) neg
 
-      criterion "accepts positive files" 0.2 . distribute $ do
-        let dir = "programs/simplearrfunc/pos/"
-        pos <- getPrograms' dir
+  criterion "accepts positive files" 0.2 . distribute $ do
+    let dir = "programs/simplearrfunc/pos/"
+    pos <- getPrograms' dir
 
-        mapM_ (check True) pos
-      
-      criterion "accepts positive crypto primitive files" 0.6 . distribute $ do
-        let dir = "programs/simplearrfunc/cryptopos/"
-        pos <- getPrograms' dir
+    mapM_ (check True) pos
+  
+  criterion "accepts positive crypto primitive files" 0.6 . distribute $ do
+    let dir = "programs/simplearrfunc/cryptopos/"
+    pos <- getPrograms' dir
 
-        mapM_ (check True) pos
-      
+    mapM_ (check True) pos
+  
 

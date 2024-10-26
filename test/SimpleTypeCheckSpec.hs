@@ -30,25 +30,24 @@ rubric = do
 
   correctVerifier <- lift . runIO . newIORef $ True
 
-  criterion "Simple type checking without arrays and functions" 1 $ do
-    bcriterion "simplest" 1.0 0.5 $ do
-      let getPrograms' dir = fmap (dir <>) <$> getPrograms dir
-      let check b f = dpasses f $ do
-            valid <- verify f `catch` \(_ :: SomeException) -> do
-              return $ not b
-            when (valid /= b) $ do
-              writeIORef correctVerifier False
-            valid @?= b
 
-      criterion "rejects negative files" 0.5 . distribute $ do
-        let dir = "programs/simple/neg/"
-        neg <- getPrograms' dir
+  let getPrograms' dir = fmap (dir <>) <$> getPrograms dir
+  let check b f = dpasses f $ do
+        valid <- verify f `catch` \(_ :: SomeException) -> do
+          return $ not b
+        when (valid /= b) $ do
+          writeIORef correctVerifier False
+        valid @?= b
 
-        mapM_ (check False) neg
+  criterion "rejects negative files" 0.5 . distribute $ do
+    let dir = "programs/simple/neg/"
+    neg <- getPrograms' dir
 
-      criterion "accepts positive files" 0.5 . distribute $ do
-        let dir = "programs/simple/pos/"
-        pos <- getPrograms' dir
+    mapM_ (check False) neg
 
-        mapM_ (check True) pos
+  criterion "accepts positive files" 0.5 . distribute $ do
+    let dir = "programs/simple/pos/"
+    pos <- getPrograms' dir
+
+    mapM_ (check True) pos
 

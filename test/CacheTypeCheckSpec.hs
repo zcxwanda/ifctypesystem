@@ -34,41 +34,40 @@ rubric = do
   -- We first run simple tests, and then proceed to verify some cypto primitives
   correctVerifier <- lift . runIO . newIORef $ True
 
-  criterion "Type checking with arrays. Attacker can time cache accesses" 1 $ do
-    bcriterion "cache" 1.0 0.5 $ do
-      let getPrograms' dir = fmap (dir <>) <$> getPrograms dir
-      let check b f = dpasses f $ do
-            valid <- verify f `catch` \(_ :: SomeException) -> do
-              return $ not b
-            when (valid /= b) $ do
-              writeIORef correctVerifier False
-            valid @?= b
 
-      criterion "rejects negative files" 0.2 . distribute $ do
-        let dir = "programs/cache/neg/"
-        neg <- getPrograms' dir
+  let getPrograms' dir = fmap (dir <>) <$> getPrograms dir
+  let check b f = dpasses f $ do
+        valid <- verify f `catch` \(_ :: SomeException) -> do
+          return $ not b
+        when (valid /= b) $ do
+          writeIORef correctVerifier False
+        valid @?= b
 
-        mapM_ (check False) neg
+  criterion "rejects negative files" 0.2 . distribute $ do
+    let dir = "programs/cache/neg/"
+    neg <- getPrograms' dir
 
-      criterion "rejects the simple negative files" 0.1 . distribute $ do
-        let dir = "programs/simple/neg/"
-        neg <- getPrograms' dir
+    mapM_ (check False) neg
 
-        mapM_ (check False) neg
-        
-      criterion "accepts positive files" 0.2 . distribute $ do
-        let dir = "programs/cache/pos/"
-        pos <- getPrograms' dir
+  criterion "rejects the simple negative files" 0.1 . distribute $ do
+    let dir = "programs/simple/neg/"
+    neg <- getPrograms' dir
 
-        mapM_ (check True) pos
+    mapM_ (check False) neg
+    
+  criterion "accepts positive files" 0.2 . distribute $ do
+    let dir = "programs/cache/pos/"
+    pos <- getPrograms' dir
 
-      criterion "accepts secure crypto files" 0.25 . distribute $ do
-        let dir = "programs/cache/cryptopos/"
-        pos <- getPrograms' dir
+    mapM_ (check True) pos
 
-        mapM_ (check True) pos
-      criterion "rejects non-constant time crypto files" 0.25 . distribute $ do
-              let dir = "programs/cache/cryptoneg/"
-              neg <- getPrograms' dir
+  criterion "accepts secure crypto files" 0.25 . distribute $ do
+    let dir = "programs/cache/cryptopos/"
+    pos <- getPrograms' dir
 
-              mapM_ (check False) neg
+    mapM_ (check True) pos
+  criterion "rejects non-constant time crypto files" 0.25 . distribute $ do
+          let dir = "programs/cache/cryptoneg/"
+          neg <- getPrograms' dir
+
+          mapM_ (check False) neg

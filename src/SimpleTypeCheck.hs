@@ -30,8 +30,10 @@ import Lattice
 typeExp :: Lattice String -> Env String -> Expr String -> String
 typeExp lat env e = case e of 
         Const _          -> smallest lat
-        Var (v :@ _)     -> undefined
-        BinOp op a b     -> undefined
+        Var (v :@ _)     -> case Just(get env v) of
+                                 Just level -> level
+                                 Nothing    -> error $ "Variable " ++ v ++ " not found."
+        BinOp op a b     -> join lat (typeExp lat env a) (typeExp lat env b)
         Select {}        -> error "No arrays in SimpleTypeCheck"
         Store  {}        -> error "No Store expressions in this assignment"
 
@@ -39,9 +41,9 @@ typeExp lat env e = case e of
 typeLogic :: Lattice String -> Env String -> Logic String -> String
 typeLogic lat env e = case e of
         Neg l           -> typeLogic lat env l
-        And ls          -> undefined
-        Pred (a :==: b) -> undefined
-        Pred (a :>=: b) -> undefined
+        And ls          -> foldr1 (join lat) (map (typeLogic lat env) ls)
+        Pred (a :==: b) -> join lat (typeExp lat env a) (typeExp lat env b)
+        Pred (a :>=: b) -> join lat (typeExp lat env a) (typeExp lat env b)
         Forall _ _      -> error "We won't deal with Forall"
 
 -- typeStmt takes a lattice structure, a program counter, an environment, the whole Nano program, and a statement
@@ -50,10 +52,19 @@ type Pc = String
 typeStmt :: Lattice String -> Pc -> Env String -> Statement String -> Bool
 typeStmt lat pc env s = case s of
         Return _     -> True
-        Assign v e   -> undefined
-        If l st sf   -> undefined
-        While l st   -> undefined
-        Seq ss       -> undefined
+        Assign v e   -> let level = typeExp lat env e
+                        in if lte lat level (get env v)
+                           then True
+                           else False
+        If l st sf   -> let level = typeLogic lat env l
+                        in if level == smallest lat
+                           then False
+                           else typeStmt lat pc env st && typeStmt lat pc env sf
+        While l st   -> let level = typeLogic lat env l
+                        in if level == smallest lat
+                           then False
+                           else typeStmt lat pc env st
+        Seq ss       -> all (typeStmt lat pc env) ss
         ArrAsn {}    -> error "No arrays in SimpleTypeCheck" 
         AppAsn {}    -> error "No function applications in SimpleTypeCheck"
         Assert _     -> error "No assertions in this assignment"

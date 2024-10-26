@@ -4,13 +4,13 @@ function hasse(){
 
 function func1(){
     type(s, "sec")
-    type(o, "pub")
+    type(o, "obs")
     if(s == 0){
         s = id(o)
     }
 }
 function id(x){
-    type(x, "pub")
+    type(x, "obs")
     type(r, "sec")
     r = x
     return r

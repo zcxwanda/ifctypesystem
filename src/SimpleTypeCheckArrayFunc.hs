@@ -39,13 +39,13 @@ typeLogic lat env e = case e of
         levelB = typeExp lat env b
      in if levelA == levelB
           then levelA
-          else error $ "Incompatible levels: " ++ levelA ++ " and " ++ levelB
+          else levelA
   Pred (a :>=: b) ->
     let levelA = typeExp lat env a
         levelB = typeExp lat env b
      in if levelA == levelB
           then levelA
-          else error $ "Incompatible levels: " ++ levelA ++ " and " ++ levelB
+          else levelB
   And ls ->
     let levels = map (typeLogic lat env) ls
      in if all (== head levels) levels
